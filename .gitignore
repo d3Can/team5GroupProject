@@ -1,0 +1,51 @@
+# Скомпилированные классы и результаты сборки
+*.class
+out/
+
+# Системные папки сборщиков
+target/
+build/
+.gradle/
+
+# Логи и временные файлы
+*.log
+tmp/
+temp/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# Системные файлы macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Системные файлы Windows
+Thumbs.db
+ehthumbs.db
+$RECYCLE.BIN/
