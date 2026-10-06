@@ -1,8 +1,9 @@
 package com.team5.strategy;
 
-import java.util.ArrayList;
+import com.team5.collection.MyArrayList;
+import com.team5.collection.MyList;
+
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.ToIntFunction;
 
 public final class EvenOddSortStrategy<T> implements SortStrategy<T> {
@@ -35,11 +36,11 @@ public final class EvenOddSortStrategy<T> implements SortStrategy<T> {
     }
 
     @Override
-    public void sort(List<T> data, Comparator<T> comparator) {
+    public void sort(MyList<T> data, Comparator<T> comparator) {
         SortStrategySupport.validateArguments(data, comparator);
 
-        List<T> evenElements = new ArrayList<>();
-        List<Integer> evenPositions = new ArrayList<>();
+        MyList<T> evenElements = new MyArrayList<>();
+        MyList<Integer> evenPositions = new MyArrayList<>();
         for (int i = 0; i < data.size(); i++) {
             if (numericFieldExtractor.applyAsInt(data.get(i)) % 2 == 0) {
                 evenElements.add(data.get(i));

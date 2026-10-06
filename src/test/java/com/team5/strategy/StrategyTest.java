@@ -1,20 +1,18 @@
 package com.team5.strategy;
 
+import com.team5.collection.MyArrayList;
+import com.team5.collection.MyList;
 import com.team5.model.Student;
 import com.team5.model.comparator.GpaComparator;
 import com.team5.model.comparator.GroupNumberComparator;
 import com.team5.model.comparator.RecordBookNumberComparator;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class StrategyTest {
     private static int passedTests = 0;
     private static int failedTests = 0;
 
     public static void main(String[] args) {
-        List<SortStrategy<Student>> strategies = Arrays.asList(
+        MyList<SortStrategy<Student>> strategies = myListOf(
                 new BubbleSortStrategy<Student>(),
                 new SelectionSortStrategy<Student>(),
                 new InsertionSortStrategy<Student>(),
@@ -48,11 +46,11 @@ public class StrategyTest {
     }
 
     private static void testStrategySortsByGroupNumber(SortStrategy<Student> strategy) {
-        List<Student> data = new ArrayList<Student>(Arrays.asList(
+        MyList<Student> data = myListOf(
                 student(103, 4.5, "ZB-03"),
                 student(101, 4.5, "ZB-01"),
                 student(102, 4.5, "ZB-02")
-        ));
+        );
         strategy.sort(data, new GroupNumberComparator());
         int[] expected = {101, 102, 103};
         check(strategy.getName() + ": сортировка по groupNumber",
@@ -60,11 +58,11 @@ public class StrategyTest {
     }
 
     private static void testStrategySortsByGpa(SortStrategy<Student> strategy) {
-        List<Student> data = new ArrayList<Student>(Arrays.asList(
+        MyList<Student> data = myListOf(
                 student(101, 4.8, "ZB-01"),
                 student(101, 3.2, "ZB-02"),
                 student(101, 4.1, "ZB-03")
-        ));
+        );
         strategy.sort(data, new GpaComparator());
         double[] expected = {3.2, 4.1, 4.8};
         boolean ok = true;
@@ -78,14 +76,14 @@ public class StrategyTest {
     }
 
     private static void testStrategySortsByRecordBookNumber(SortStrategy<Student> strategy) {
-        List<Student> data = new ArrayList<Student>(Arrays.asList(
+        MyList<Student> data = myListOf(
                 student(101, 4.5, "ZB-0003"),
                 student(101, 4.5, "ZB-0001"),
                 student(101, 4.5, "ZB-0002")
-        ));
+        );
         strategy.sort(data, new RecordBookNumberComparator());
-        List<String> expected = Arrays.asList("ZB-0001", "ZB-0002", "ZB-0003");
-        List<String> actual = new ArrayList<String>();
+        MyList<String> expected = myListOf("ZB-0001", "ZB-0002", "ZB-0003");
+        MyList<String> actual = new MyArrayList<String>();
         for (Student student : data) {
             actual.add(student.getRecordBookNumber());
         }
@@ -94,14 +92,14 @@ public class StrategyTest {
     }
 
     private static void testStrategyHandlesEmptyList(SortStrategy<Student> strategy) {
-        List<Student> data = new ArrayList<Student>();
+        MyList<Student> data = new MyArrayList<Student>();
         strategy.sort(data, new GroupNumberComparator());
         check(strategy.getName() + ": пустой список",
                 data.isEmpty());
     }
 
     private static void testStrategyHandlesSingleElement(SortStrategy<Student> strategy) {
-        List<Student> data = new ArrayList<Student>();
+        MyList<Student> data = new MyArrayList<Student>();
         data.add(student(101, 4.5, "ZB-0001"));
         strategy.sort(data, new GroupNumberComparator());
         check(strategy.getName() + ": один элемент",
@@ -121,7 +119,7 @@ public class StrategyTest {
     private static void testStrategyRejectsNullComparator(SortStrategy<Student> strategy) {
         boolean thrown = false;
         try {
-            strategy.sort(new ArrayList<Student>(), null);
+            strategy.sort(new MyArrayList<Student>(), null);
         } catch (IllegalArgumentException exception) {
             thrown = true;
         }
@@ -129,7 +127,7 @@ public class StrategyTest {
     }
 
     private static void testEvenOddKeepsOddInPlace() {
-        List<Student> data = new ArrayList<Student>(Arrays.asList(
+        MyList<Student> data = myListOf(
                 student(3, 4.0, "ZB-01"),
                 student(8, 4.0, "ZB-02"),
                 student(5, 4.0, "ZB-03"),
@@ -138,7 +136,7 @@ public class StrategyTest {
                 student(4, 4.0, "ZB-06"),
                 student(9, 4.0, "ZB-07"),
                 student(6, 4.0, "ZB-08")
-        ));
+        );
 
         SortStrategy<Student> strategy = new EvenOddSortStrategy<Student>(
                 new QuickSortStrategy<Student>(),
@@ -147,18 +145,18 @@ public class StrategyTest {
         );
         strategy.sort(data, new GroupNumberComparator());
 
-        List<Integer> expected = Arrays.asList(3, 2, 5, 4, 7, 6, 9, 8);
+        MyList<Integer> expected = myListOf(3, 2, 5, 4, 7, 6, 9, 8);
         check("EvenOdd: нечётные на своих местах, чётные отсортированы",
                 groupNumbersOf(data).equals(expected));
     }
 
     private static void testEvenOddOnStudentsByGroupNumber() {
-        List<Student> data = new ArrayList<Student>(Arrays.asList(
+        MyList<Student> data = myListOf(
                 student(8, 4.0, "ZB-01"),
                 student(2, 4.0, "ZB-02"),
                 student(6, 4.0, "ZB-03"),
                 student(4, 4.0, "ZB-04")
-        ));
+        );
         SortStrategy<Student> strategy = new EvenOddSortStrategy<Student>(
                 new BubbleSortStrategy<Student>(),
                 Student::getGroupNumber,
@@ -166,7 +164,7 @@ public class StrategyTest {
         );
         strategy.sort(data, new GroupNumberComparator());
 
-        List<Integer> expected = Arrays.asList(2, 4, 6, 8);
+        MyList<Integer> expected = myListOf(2, 4, 6, 8);
         check("EvenOdd: только чётные — все сортируются",
                 groupNumbersOf(data).equals(expected));
     }
@@ -221,16 +219,16 @@ public class StrategyTest {
                 .build();
     }
 
-    private static List<Integer> groupNumbersOf(List<Student> data) {
-        List<Integer> result = new ArrayList<Integer>();
+    private static MyList<Integer> groupNumbersOf(MyList<Student> data) {
+        MyList<Integer> result = new MyArrayList<Integer>();
         for (Student student : data) {
             result.add(student.getGroupNumber());
         }
         return result;
     }
 
-    private static List<Integer> toList(int[] source) {
-        List<Integer> result = new ArrayList<Integer>(source.length);
+    private static MyList<Integer> toList(int[] source) {
+        MyList<Integer> result = new MyArrayList<Integer>(source.length);
         for (int value : source) {
             result.add(value);
         }
@@ -245,5 +243,14 @@ public class StrategyTest {
             failedTests++;
             System.out.println("FAIL: " + testName);
         }
+    }
+
+    @SafeVarargs
+    private static <T> MyList<T> myListOf(T... elements) {
+        MyList<T> list = new MyArrayList<>();
+        for (T element : elements) {
+            list.add(element);
+        }
+        return list;
     }
 }

@@ -1,17 +1,18 @@
 package com.team5.strategy;
 
+import com.team5.collection.MyList;
+
 import java.util.Comparator;
-import java.util.List;
 
 public final class QuickSortStrategy<T> implements SortStrategy<T> {
 
     @Override
-    public void sort(List<T> data, Comparator<T> comparator) {
+    public void sort(MyList<T> data, Comparator<T> comparator) {
         SortStrategySupport.validateArguments(data, comparator);
         quickSort(data, comparator, 0, data.size() - 1);
     }
 
-    private void quickSort(List<T> data,
+    private void quickSort(MyList<T> data,
                            Comparator<T> comparator,
                            int low,
                            int high) {
@@ -23,7 +24,7 @@ public final class QuickSortStrategy<T> implements SortStrategy<T> {
         quickSort(data, comparator, pivotIndex + 1, high);
     }
 
-    private int partition(List<T> data,
+    private int partition(MyList<T> data,
                           Comparator<T> comparator,
                           int low,
                           int high) {
