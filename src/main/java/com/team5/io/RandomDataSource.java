@@ -1,6 +1,7 @@
 package com.team5.io;
 
-import com.team5.collection.CustomList;
+import com.team5.collection.MyArrayList;
+import com.team5.collection.MyList;
 import com.team5.model.Student;
 
 import java.util.Random;
@@ -29,12 +30,12 @@ public class RandomDataSource implements DataSource {
     }
 
     @Override
-    public CustomList<Student> load(int length) {
+    public MyList<Student> load(int length) {
         if (length > RECORD_BOOK_CAPACITY) {
             throw new RuntimeException("Невозможно сгенерировать больше "
                     + RECORD_BOOK_CAPACITY + " студентов с уникальными зачётками");
         }
-        CustomList<Student> result = new CustomList<>();
+        MyList<Student> result = new MyArrayList<>();
         Stream.generate(this::randomStudent).limit(length).forEach(result::add);
         return result;
     }

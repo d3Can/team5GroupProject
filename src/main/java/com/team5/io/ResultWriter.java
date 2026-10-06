@@ -1,6 +1,6 @@
 package com.team5.io;
 
-import com.team5.collection.CustomList;
+import com.team5.collection.MyList;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.nio.file.StandardOpenOption;
  */
 public class ResultWriter {
 
-    public <T> void append(Path path, String title, CustomList<T> list) throws IOException {
+    public <T> void append(Path path, String title, MyList<T> list) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             writer.write("# " + title);

@@ -1,6 +1,7 @@
 package com.team5.io;
 
-import com.team5.collection.CustomList;
+import com.team5.collection.MyArrayList;
+import com.team5.collection.MyList;
 import com.team5.model.Student;
 
 import java.io.IOException;
@@ -23,8 +24,8 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public CustomList<Student> load(int length) {
-        CustomList<Student> result = new CustomList<>();
+    public MyList<Student> load(int length) {
+        MyList<Student> result = new MyArrayList<>();
         try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
             lines.map(this::tryParse)
                     .filter(Objects::nonNull)

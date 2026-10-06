@@ -1,6 +1,6 @@
 package com.team5.io;
 
-import com.team5.collection.CustomList;
+import com.team5.collection.MyList;
 import com.team5.model.Student;
 
 /**
@@ -8,5 +8,5 @@ import com.team5.model.Student;
  */
 public interface DataSource {
 
-    CustomList<Student> load(int length);
+    MyList<Student> load(int length);
 }
