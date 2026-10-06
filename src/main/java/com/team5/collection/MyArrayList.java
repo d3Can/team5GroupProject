@@ -183,4 +183,28 @@ public class MyArrayList<T> implements MyList<T> {
         }
         return sb.append(']').toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MyList<?> other)) return false;
+        if (this.size() != other.size()) return false;
+
+        for (int i = 0; i < size; i++) {
+            if (!Objects.equals(this.get(i), other.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        for (int i = 0; i < size; i++) {
+            Object element = elements[i];
+            result = 31 * result + (element == null ? 0 : element.hashCode());
+        }
+        return result;
+    }
 }
