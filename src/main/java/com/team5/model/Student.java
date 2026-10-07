@@ -77,14 +77,19 @@ public final class Student implements Comparable<Student> {
      * <p>
      * Пример использования:
      * <pre>
-     * Student student = new Student.Builder()
-     *         .setGroupNumber(101)
-     *         .setGpa(4.8)
-     *         .setRecordBookNumber("ZB-9912")
+     * Student student = Student.builder()
+     *         .GroupNumber(101)
+     *         .Gpa(4.8)
+     *         .RecordBookNumber("ZB-9912")
      *         .build();
      * </pre>
      * </p>
      */
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         private static final double MIN_GPA = 0.0;
         private static final double MAX_GPA = 5.0;
@@ -94,17 +99,17 @@ public final class Student implements Comparable<Student> {
         private double gpa;
         private String recordBookNumber;
 
-        public Builder setGroupNumber(int groupNumber) {
+        public Builder GroupNumber(int groupNumber) {
             this.groupNumber = groupNumber;
             return this;
         }
 
-        public Builder setGpa(double gpa) {
+        public Builder Gpa(double gpa) {
             this.gpa = gpa;
             return this;
         }
 
-        public Builder setRecordBookNumber(String recordBookNumber) {
+        public Builder RecordBookNumber(String recordBookNumber) {
             this.recordBookNumber = recordBookNumber;
             return this;
         }

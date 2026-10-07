@@ -212,10 +212,10 @@ public class StrategyTest {
     }
 
     private static Student student(int groupNumber, double gpa, String recordBookNumber) {
-        return new Student.Builder()
-                .setGroupNumber(groupNumber)
-                .setGpa(gpa)
-                .setRecordBookNumber(recordBookNumber)
+        return Student.builder()
+                .GroupNumber(groupNumber)
+                .Gpa(gpa)
+                .RecordBookNumber(recordBookNumber)
                 .build();
     }
 
