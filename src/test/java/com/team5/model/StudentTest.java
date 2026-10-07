@@ -39,10 +39,10 @@ public class StudentTest {
 
     private static void testBuilderCreatesValidStudent() {
         try {
-            Student student = new Student.Builder()
-                    .setGroupNumber(101)
-                    .setGpa(4.8)
-                    .setRecordBookNumber("ZB-9912")
+            Student student = Student.builder()
+                    .GroupNumber(101)
+                    .Gpa(4.8)
+                    .RecordBookNumber("ZB-9912")
                     .build();
 
             boolean fieldsCorrect = student.getGroupNumber() == 101
@@ -67,10 +67,10 @@ public class StudentTest {
 
     private static void testBuilderRejectsNegativeGroupNumber() {
         try {
-            new Student.Builder()
-                    .setGroupNumber(-1)
-                    .setGpa(4.0)
-                    .setRecordBookNumber("ZB-0001")
+            Student.builder()
+                    .GroupNumber(-1)
+                    .Gpa(4.0)
+                    .RecordBookNumber("ZB-0001")
                     .build();
             failedTests++;
             System.out.println("FAIL: testBuilderRejectsNegativeGroupNumber");
@@ -88,10 +88,10 @@ public class StudentTest {
 
     private static void testBuilderRejectsInvalidGpa() {
         try {
-            new Student.Builder()
-                    .setGroupNumber(101)
-                    .setGpa(6.0)
-                    .setRecordBookNumber("ZB-0001")
+            Student.builder()
+                    .GroupNumber(101)
+                    .Gpa(6.0)
+                    .RecordBookNumber("ZB-0001")
                     .build();
             failedTests++;
             System.out.println("FAIL: testBuilderRejectsInvalidGpa");
@@ -109,10 +109,10 @@ public class StudentTest {
 
     private static void testBuilderRejectsBlankRecordBookNumber() {
         try {
-            new Student.Builder()
-                    .setGroupNumber(101)
-                    .setGpa(4.0)
-                    .setRecordBookNumber("   ")
+            Student.builder()
+                    .GroupNumber(101)
+                    .Gpa(4.0)
+                    .RecordBookNumber("   ")
                     .build();
             failedTests++;
             System.out.println("FAIL: testBuilderRejectsBlankRecordBookNumber");
@@ -129,15 +129,15 @@ public class StudentTest {
     }
 
     private static void testGroupNumberComparator() {
-        Student first = new Student.Builder()
-                .setGroupNumber(101)
-                .setGpa(4.0)
-                .setRecordBookNumber("ZB-0001")
+        Student first = Student.builder()
+                .GroupNumber(101)
+                .Gpa(4.0)
+                .RecordBookNumber("ZB-0001")
                 .build();
-        Student second = new Student.Builder()
-                .setGroupNumber(102)
-                .setGpa(4.0)
-                .setRecordBookNumber("ZB-0002")
+        Student second = Student.builder()
+                .GroupNumber(102)
+                .Gpa(4.0)
+                .RecordBookNumber("ZB-0002")
                 .build();
 
         if (new GroupNumberComparator().compare(first, second) < 0) {
@@ -150,15 +150,15 @@ public class StudentTest {
     }
 
     private static void testGpaComparator() {
-        Student first = new Student.Builder()
-                .setGroupNumber(101)
-                .setGpa(4.5)
-                .setRecordBookNumber("ZB-0001")
+        Student first = Student.builder()
+                .GroupNumber(101)
+                .Gpa(4.5)
+                .RecordBookNumber("ZB-0001")
                 .build();
-        Student second = new Student.Builder()
-                .setGroupNumber(101)
-                .setGpa(3.5)
-                .setRecordBookNumber("ZB-0002")
+        Student second = Student.builder()
+                .GroupNumber(101)
+                .Gpa(3.5)
+                .RecordBookNumber("ZB-0002")
                 .build();
 
         if (new GpaComparator().compare(first, second) > 0) {
@@ -171,15 +171,15 @@ public class StudentTest {
     }
 
     private static void testRecordBookNumberComparator() {
-        Student first = new Student.Builder()
-                .setGroupNumber(101)
-                .setGpa(4.0)
-                .setRecordBookNumber("ZB-0001")
+        Student first = Student.builder()
+                .GroupNumber(101)
+                .Gpa(4.0)
+                .RecordBookNumber("ZB-0001")
                 .build();
-        Student second = new Student.Builder()
-                .setGroupNumber(101)
-                .setGpa(4.0)
-                .setRecordBookNumber("ZB-0002")
+        Student second = Student.builder()
+                .GroupNumber(101)
+                .Gpa(4.0)
+                .RecordBookNumber("ZB-0002")
                 .build();
 
         if (new RecordBookNumberComparator().compare(first, second) < 0) {
@@ -192,15 +192,15 @@ public class StudentTest {
     }
 
     private static void testNaturalOrdering() {
-        Student first = new Student.Builder()
-                .setGroupNumber(101)
-                .setGpa(4.0)
-                .setRecordBookNumber("ZB-0002")
+        Student first = Student.builder()
+                .GroupNumber(101)
+                .Gpa(4.0)
+                .RecordBookNumber("ZB-0002")
                 .build();
-        Student second = new Student.Builder()
-                .setGroupNumber(101)
-                .setGpa(4.0)
-                .setRecordBookNumber("ZB-0001")
+        Student second = Student.builder()
+                .GroupNumber(101)
+                .Gpa(4.0)
+                .RecordBookNumber("ZB-0001")
                 .build();
 
         if (first.compareTo(second) > 0) {
