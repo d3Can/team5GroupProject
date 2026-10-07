@@ -49,11 +49,5 @@ public class RandomDataSource implements DataSource {
                 .setGpa(gpa)
                 .setRecordBookNumber(recordBook)
                 .build();
-        /// TODO По идее экземпляр класса через Builder должен создаваться следующим образом
-        ///        return Student.builder()
-        ///                .groupNumber(group)
-        ///                .gpa(gpa)
-        ///                .recordBookNumber(recordBook)
-        ///                .build();
     }
 }
