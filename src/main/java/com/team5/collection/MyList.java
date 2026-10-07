@@ -15,4 +15,5 @@ public interface MyList<T> extends Iterable<T> {
     boolean contains(T element);
     int indexOf(T element);
     Stream<T> stream();
+    void addAll(MyList<? extends T> other);
 }

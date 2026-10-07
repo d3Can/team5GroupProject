@@ -1,15 +1,24 @@
 package com.team5.menu;
 
+import com.team5.collection.MyList;
+import com.team5.io.*;
 import com.team5.model.Student;
-import java.util.List;
+import com.team5.model.comparator.GpaComparator;
+import com.team5.model.comparator.GroupNumberComparator;
+import com.team5.model.comparator.RecordBookNumberComparator;
+import com.team5.strategy.*;
+import com.team5.threads.OccurrenceCounter;
+
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class LoopMenu {
 
-    private final List<Student> students;
+    private final MyList<Student> students;
     private final Scanner scanner = new Scanner(System.in);
 
-    public LoopMenu(List<Student> students) {
+    public LoopMenu(MyList<Student> students) {
         this.students = students;
     }
 
@@ -26,11 +35,10 @@ public class LoopMenu {
                     menuIsRunning = false;
                 }
                 case 1 -> inputMethodChoice();
-                case 2 -> System.out.println("Иммитация передачи в сортировку");
-                //todo СДЕЛАТЬ ВЫБОР СОРТИРОВКИ!!!!!!!!!
+                case 2 -> sortChoice();
                 case 3 -> System.out.println(students);
-                case 4 -> System.out.println("Иммитация передачи в запись в файл");
-                case 5 -> System.out.println("Иммитация передачи в подсчёт количества вхождений");
+                case 4 -> writeToFile();
+                case 5 -> countOccurrences();
                 default -> System.out.println("Введите корректно и согласно меню!");
 
             }
@@ -78,26 +86,186 @@ public class LoopMenu {
             switch (inputMethod) {
                 case 1 -> {
                     int collectionSize = readIntInput("Выберете длину коллекции");
-                    System.out.println("происходит иммитация передачи в ввод из файла");
-                    //todo В КОНЦЕ ОБНОВИТЬ НА НАСТОЯЩЕЕ
-                    inputMethodRunning = false;
+                    if (collectionSize < 0) {
+                        System.out.println("Длина некорректна");
+                        break;
+                    }
+
+                    System.out.println("Введите путь к файлу");
+                    String fileName = scanner.nextLine();
+
+                    try {
+                        MyList<Student> loaded = new FileDataSource(Path.of(fileName)).load(collectionSize);
+                        students.clear();
+                        students.addAll(loaded);
+                        System.out.println("Ввод из файла успешно завершён");
+                        inputMethodRunning = false;
+                    } catch (Exception e) {
+                        System.out.println("Ошибка чтения: " + e.getMessage());
+                    }
                 }
                 case 2 -> {
                     int collectionSize = readIntInput("Выберете длину коллекции");
-                    System.out.println("происходит иммитация передачи в случайный ввод");
-                    //todo В КОНЦЕ ОБНОВИТЬ НА НАСТОЯЩЕЕ
-                    inputMethodRunning = false;
+                    if (collectionSize < 0) {
+                        System.out.println("Длина некорректна");
+                        break;
+                    }
+
+                    try {
+                        MyList<Student> loaded = new RandomDataSource().load(collectionSize);
+                        students.clear();
+                        students.addAll(loaded);
+                        System.out.println("Ввод случайными данными успешно выполнен");
+                        inputMethodRunning = false;
+                    } catch (Exception e) {
+                        System.out.println("Ошибка генерации: " + e.getMessage());
+                    }
                 }
                 case 3 -> {
                     int collectionSize = readIntInput("Выберете длину коллекции");
-                    for (int i = 0; i < collectionSize; i++) {
-                        System.out.println("происходит иммитация передачи в ручной ввод");
+                    if (collectionSize < 0) {
+                        System.out.println("Длина некорректна");
+                        break;
                     }
-                    inputMethodRunning = false;
+
+                    try {
+                        MyList<Student> loaded = new ManualDataSource(scanner).load(collectionSize);
+                        students.clear();
+                        students.addAll(loaded);
+                        System.out.println("Ввод вручную успешно выполнен");
+                        inputMethodRunning = false;
+                    } catch (Exception e) {
+                        System.out.println("Ошибка ввода: " + e.getMessage());
+                    }
                 }
                 case 4 -> inputMethodRunning = false;
                 default -> System.out.println("Выберете пункт из предложенных");
             }
         }
+    }
+
+    private void sortChoice(){
+        if (students.isEmpty()) {
+            System.out.println("Список пуст. Сначала добавьте студентов.");
+            return;
+        }
+
+        int algorithmMethod = readIntInput("""
+                            ====== Выбор алгоритма ======
+                            1. Bubble
+                            2. Selection
+                            3. Insertion
+                            4. Quick
+                            5. Merge
+                            6. Вернуться в главное меню
+                            =============================
+                            Выберете алгоритм""");
+        SortStrategy<Student> strategy = switch (algorithmMethod) {
+            case 1 -> new BubbleSortStrategy<>();
+            case 2 -> new SelectionSortStrategy<>();
+            case 3 -> new InsertionSortStrategy<>();
+            case 4 -> new QuickSortStrategy<>();
+            case 5 -> new MergeSortStrategy<>();
+            default -> null;
+        };
+        if (strategy == null) return;
+
+        int oddEvenChoice = readIntInput("""
+                            ====== Выбор обычной или чётной/нечётной ======
+                            1. Обычная
+                            2. Чётная/нечётная
+                            3. Вернуться в главное меню
+                            =============================
+                            Выберете способ""");
+        if (oddEvenChoice == 2) {
+            strategy = new EvenOddSortStrategy<>(
+                    strategy,
+                    Student::getGroupNumber,
+                    "groupNumber"
+            );
+        } else if (oddEvenChoice != 1) {
+            return;
+        }
+
+        int comparatorChoice = readIntInput("""
+                            ====== Выбор метода сравнения ======
+                            1. Группа
+                            2. Средний балл
+                            3. Зачётка
+                            4. Натуральный порядок
+                            5. Вернуться в главное меню
+                            =============================
+                            Выберете способ сравнения""");
+        Comparator<Student> comparator = switch (comparatorChoice){
+            case 1 -> new GroupNumberComparator();
+            case 2 -> new GpaComparator();
+            case 3 -> new RecordBookNumberComparator();
+            case 4 -> Comparator.naturalOrder();
+            default -> null;
+        };
+        if (comparator == null) return;
+
+        strategy.sort(students, comparator);
+        System.out.println("Готово: " + strategy.getName());
+    }
+
+    private void writeToFile() {
+        if (students.isEmpty()) {
+            System.out.println("Список пуст");
+            return;
+        }
+        System.out.print("Путь к файлу: ");
+        String path = scanner.nextLine().trim();
+        System.out.print("Заголовок: ");
+        String title = scanner.nextLine().trim();
+        try {
+            new ResultWriter().append(Path.of(path), title, students);
+            System.out.println("Записано");
+        } catch (Exception e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+    }
+
+    private void countOccurrences() {
+        if (students.isEmpty()) {
+            System.out.println("Список пуст");
+            return;
+        }
+        int group = readIntInput("Группа");
+        if (group < 1) {
+            System.out.println("Группа должна быть >= 1");
+            return;
+        }
+
+        System.out.print("Средний балл: ");
+        double gpa;
+        try {
+            gpa = Double.parseDouble(scanner.nextLine().trim().replace(',', '.'));
+        } catch (NumberFormatException e) {
+            System.out.println("Некорректный GPA (введите число, например: 4.5)");
+            return;
+        }
+
+        System.out.print("Зачётка: ");
+        String recordBook = scanner.nextLine().trim();
+
+        Student target;
+        try {
+            target = Student.builder()
+                    .GroupNumber(group)
+                    .Gpa(gpa)
+                    .RecordBookNumber(recordBook)
+                    .build();
+        } catch (IllegalArgumentException e) {
+            System.out.println("Некорректные данные: " + e.getMessage());
+            return;
+        }
+
+        int threads = readIntInput("Число потоков");
+        if (threads < 1) {
+            System.out.println("Потоков должно быть >= 1");
+            return;
+        }
+        new OccurrenceCounter(threads).countAndPrint(students, target);
     }
 }
