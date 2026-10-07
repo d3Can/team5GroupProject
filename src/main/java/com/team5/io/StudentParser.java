@@ -63,10 +63,10 @@ public final class StudentParser {
         int group = parseInt(text.substring(groupStart, gpaKey), "Номер группы");
         double gpa = parseDouble(text.substring(gpaStart, bookKey), "Средний балл");
         String recordBook = parseString(text.substring(bookStart, bookEnd), "Номер зачётной книжки");
-        return new Student.Builder()
-                .setGroupNumber(group)
-                .setGpa(gpa)
-                .setRecordBookNumber(recordBook)
+        return Student.builder()
+                .GroupNumber(group)
+                .Gpa(gpa)
+                .RecordBookNumber(recordBook)
                 .build();
     }
 
