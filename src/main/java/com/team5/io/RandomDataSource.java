@@ -44,16 +44,10 @@ public class RandomDataSource implements DataSource {
         int group = MIN_GROUP + random.nextInt(MAX_GROUP - MIN_GROUP);
         double gpa = Math.round(random.nextDouble() * 500) / 100.0;
         String recordBook = String.valueOf(CURRENT_RECORD_BOOK++);
-        return new Student.Builder()
-                .setGroupNumber(group)
-                .setGpa(gpa)
-                .setRecordBookNumber(recordBook)
+        return Student.builder()
+                .GroupNumber(group)
+                .Gpa(gpa)
+                .RecordBookNumber(recordBook)
                 .build();
-        /// TODO По идее экземпляр класса через Builder должен создаваться следующим образом
-        ///        return Student.builder()
-        ///                .groupNumber(group)
-        ///                .gpa(gpa)
-        ///                .recordBookNumber(recordBook)
-        ///                .build();
     }
 }

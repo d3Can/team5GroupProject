@@ -23,18 +23,11 @@ public final class StudentParser {
         int group = parseInt(parts[0], "Номер группы");
         double gpa = parseDouble(parts[1], "Средний балл");
         String recordBook = parseString(parts[2], "Номер зачётной книжки");
-        return new Student.Builder()
-                .setGroupNumber(group)
-                .setGpa(gpa)
-                .setRecordBookNumber(recordBook)
+        return Student.builder()
+                .GroupNumber(group)
+                .Gpa(gpa)
+                .RecordBookNumber(recordBook)
                 .build();
-        /// TODO По идее экземпляр класса через Builder должен создаваться следующим образом
-        ///        return Student.builder()
-        ///                .groupNumber(group)
-        ///                .gpa(gpa)
-        ///                .recordBookNumber(recordBook)
-        ///                .build();
-        ///        return null;
     }
 
     private static int parseInt(String raw, String field) {
