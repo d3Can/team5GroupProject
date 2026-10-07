@@ -11,10 +11,10 @@ import com.team5.model.comparator.RecordBookNumberComparator;
 public class Main {
     public static void main(String[] args) {
         // Создание
-        Student student = new Student.Builder()
-                .setGroupNumber(101)
-                .setGpa(4.8)
-                .setRecordBookNumber("ZB-9912")
+        Student student = Student.builder()
+                .GroupNumber(101)
+                .Gpa(4.8)
+                .RecordBookNumber("ZB-9912")
                 .build();
 
         // Чтение полей
