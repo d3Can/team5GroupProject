@@ -207,4 +207,11 @@ public class MyArrayList<T> implements MyList<T> {
         }
         return result;
     }
+
+    @Override
+    public void addAll(MyList<? extends T> other) {
+        for (int i = 0; i < other.size(); i++) {
+            add(other.get(i));
+        }
+    }
 }
