@@ -13,9 +13,14 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
- * Чтение студентов из файла. Некорректные строки пропускаются с сообщением.
+ * Чтение студентов из файла. Понимает формат, в котором пишет {@code ResultWriter}
+ * ({@code Student{groupNumber=.., gpa=.., recordBookNumber='..'}}, заголовки {@code # ..}
+ * пропускаются), а также компактный формат {@code группа;балл;зачётка}.
+ * Некорректные строки пропускаются с сообщением.
  */
 public class FileDataSource implements DataSource {
+
+    private static final String RESULT_HEADER = "#";
 
     private final Path path;
 
@@ -38,11 +43,15 @@ public class FileDataSource implements DataSource {
     }
 
     private Student tryParse(String line) {
-        if (line.isBlank()) {
+        String text = line.trim();
+        // пустые строки и заголовки блоков ("# ..."), которые пишет ResultWriter
+        if (text.isEmpty() || text.startsWith(RESULT_HEADER)) {
             return null;
         }
         try {
-            return StudentParser.parse(line);
+            return text.startsWith(StudentParser.RECORD_PREFIX)
+                    ? StudentParser.parseRecord(text)
+                    : StudentParser.parse(text);
         } catch (RuntimeException e) {
             System.out.println("  Пропущена строка '" + line + "': " + e.getMessage());
             return null;

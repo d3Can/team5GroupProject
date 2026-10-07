@@ -30,6 +30,46 @@ public final class StudentParser {
                 .build();
     }
 
+    /** Префикс строки, которую записывает {@code ResultWriter} (формат {@code Student.toString()}). */
+    public static final String RECORD_PREFIX = "Student{";
+
+    private static final String GROUP_KEY = "groupNumber=";
+    private static final String GPA_KEY = ", gpa=";
+    private static final String BOOK_KEY = ", recordBookNumber='";
+    private static final String BOOK_END = "'}";
+
+    /**
+     * Разбор строки в формате, в котором студентов записывает {@code ResultWriter}:
+     * {@code Student{groupNumber=1, gpa=4.5, recordBookNumber='123456'}}.
+     * Формат должен совпадать с {@code Student.toString()}; это проверяет тест
+     * «записал - прочитал».
+     */
+    public static Student parseRecord(String line) {
+        if (line == null || line.isBlank()) {
+            throw new RuntimeException("Пустая строка");
+        }
+        String text = line.trim();
+        int gpaKey = text.indexOf(GPA_KEY);
+        int bookKey = gpaKey < 0 ? -1 : text.indexOf(BOOK_KEY, gpaKey);
+        int groupStart = RECORD_PREFIX.length() + GROUP_KEY.length();
+        int gpaStart = gpaKey + GPA_KEY.length();
+        int bookStart = bookKey + BOOK_KEY.length();
+        int bookEnd = text.length() - BOOK_END.length();
+        if (!text.startsWith(RECORD_PREFIX + GROUP_KEY) || !text.endsWith(BOOK_END)
+                || gpaKey < groupStart || bookKey < gpaStart || bookEnd < bookStart) {
+            throw new RuntimeException("Ожидается формат "
+                    + "'Student{groupNumber=..., gpa=..., recordBookNumber='...'}', получено: " + line);
+        }
+        int group = parseInt(text.substring(groupStart, gpaKey), "Номер группы");
+        double gpa = parseDouble(text.substring(gpaStart, bookKey), "Средний балл");
+        String recordBook = parseString(text.substring(bookStart, bookEnd), "Номер зачётной книжки");
+        return Student.builder()
+                .GroupNumber(group)
+                .Gpa(gpa)
+                .RecordBookNumber(recordBook)
+                .build();
+    }
+
     private static int parseInt(String raw, String field) {
         try {
             return Integer.parseInt(raw.trim());

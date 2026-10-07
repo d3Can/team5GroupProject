@@ -15,12 +15,14 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
+import static com.team5.TestSupport.captureOutput;
 import static com.team5.TestSupport.check;
 import static com.team5.TestSupport.expectInvalid;
 import static com.team5.TestSupport.expectThrows;
 import static com.team5.TestSupport.run;
 import static com.team5.TestSupport.sample;
 import static com.team5.TestSupport.section;
+import static com.team5.TestSupport.student;
 
 /**
  * Тесты пакета io: парсер, источники данных (файл, рандом, ручной ввод) и запись в файл.
@@ -41,6 +43,9 @@ public final class InputOutputTest {
         run("Парсер: граничные значения", InputOutputTest::testParserBoundaries);
         run("Парсер: некорректные строки", InputOutputTest::testParserInvalid);
         run("Парсер: сообщения называют поле", InputOutputTest::testParserMessages);
+        run("Парсер записи: формат Student{...}", InputOutputTest::testRecordParserValid);
+        run("Парсер записи: некорректные строки", InputOutputTest::testRecordParserInvalid);
+        run("Парсер записи: toString -> parseRecord даёт равного студента", InputOutputTest::testRecordRoundTrip);
         run("Рандом: длина и допустимые значения", InputOutputTest::testRandomBasics);
         run("Рандом: нулевая длина", InputOutputTest::testRandomZeroLength);
         run("Рандом: зачётки уникальны (в том числе между загрузками)", InputOutputTest::testRandomUniqueRecordBooks);
@@ -49,6 +54,11 @@ public final class InputOutputTest {
         run("Файл: мусор и пустые строки пропускаются", InputOutputTest::testFileSkipsInvalid);
         run("Файл: порядок строк сохраняется", InputOutputTest::testFileKeepsOrder);
         run("Файл: ограничение длины", InputOutputTest::testFileLengthLimit);
+        run("Файл: читает то, что записал ResultWriter", InputOutputTest::testFileReadsWrittenFormat);
+        run("Файл: несколько дописанных блоков", InputOutputTest::testFileReadsAppendedBlocks);
+        run("Файл: заголовки и пустые строки пропускаются молча", InputOutputTest::testFileSkipsHeadersSilently);
+        run("Файл: битая строка формата записи пропускается с сообщением", InputOutputTest::testFileReportsBrokenRecord);
+        run("Файл: оба формата в одном файле", InputOutputTest::testFileMixedFormats);
         run("Файл: пустой файл", InputOutputTest::testFileEmpty);
         run("Файл: переводы строк Windows", InputOutputTest::testFileCrlf);
         run("Файл: отсутствующий файл", InputOutputTest::testFileMissing);
@@ -101,19 +111,70 @@ public final class InputOutputTest {
     }
 
     private static void testParserMessages() {
-        check(testMessageOf("abc;4;123456").contains("Номер группы"), "группа");
-        check(testMessageOf("1;xyz;123456").contains("Средний балл"), "балл");
-        check(testMessageOf("1;4;   ").contains("зачётной книжки"), "зачётка");
-        check(testMessageOf("1;2").contains("группа;балл;зачётка"), "формат");
+        check(messageOf("abc;4;123456").contains("Номер группы"), "группа");
+        check(messageOf("1;xyz;123456").contains("Средний балл"), "балл");
+        check(messageOf("1;4;   ").contains("зачётной книжки"), "зачётка");
+        check(messageOf("1;2").contains("группа;балл;зачётка"), "формат");
     }
 
-    private static String testMessageOf(String line) {
+    private static String messageOf(String line) {
+        return messageOf(line, false);
+    }
+
+    private static String messageOf(String line, boolean record) {
         try {
-            StudentParser.parse(line);
+            if (record) {
+                StudentParser.parseRecord(line);
+            } else {
+                StudentParser.parse(line);
+            }
         } catch (RuntimeException e) {
             return e.getMessage();
         }
         throw new AssertionError("ожидалось исключение для: " + line);
+    }
+
+    private static void testRecordParserValid() {
+        Student student = StudentParser.parseRecord("Student{groupNumber=5, gpa=4.25, recordBookNumber='654321'}");
+        check(student.getGroupNumber() == 5 && student.getGpa() == 4.25
+                && student.getRecordBookNumber().equals("654321"), "значения");
+        check(StudentParser.parseRecord("  Student{groupNumber=1, gpa=4.0, recordBookNumber='012345'}  ")
+                .getRecordBookNumber().equals("012345"), "ведущий ноль и пробелы вокруг строки");
+        check(StudentParser.parseRecord("Student{groupNumber=1, gpa=4.0, recordBookNumber='ZB-9912'}")
+                .getRecordBookNumber().equals("ZB-9912"), "не число");
+        check(StudentParser.parseRecord("Student{groupNumber=1, gpa=4.0, recordBookNumber='A, 1'}")
+                .getRecordBookNumber().equals("A, 1"), "запятая внутри зачётки");
+        check(StudentParser.parseRecord("Student{groupNumber=1, gpa=1.0E-4, recordBookNumber='A'}")
+                .getGpa() == 1.0E-4, "экспоненциальная запись из Double.toString");
+    }
+
+    private static void testRecordParserInvalid() {
+        expectInvalid(() -> StudentParser.parseRecord(null));
+        expectInvalid(() -> StudentParser.parseRecord("  "));
+        expectInvalid(() -> StudentParser.parseRecord("Student{}"));
+        expectInvalid(() -> StudentParser.parseRecord("1;4;123456"));
+        expectInvalid(() -> StudentParser.parseRecord("Student{groupNumber=1, gpa=4.0, recordBookNumber='1'"));
+        expectInvalid(() -> StudentParser.parseRecord("Student{groupNumber=1, gpa=4.0}"));
+        expectInvalid(() -> StudentParser.parseRecord("Student{groupNumber=1, gpa=4.0, recordBookNumber='}"));
+        expectInvalid(() -> StudentParser.parseRecord("Student{groupNumber=a, gpa=4.0, recordBookNumber='1'}"));
+        expectInvalid(() -> StudentParser.parseRecord("Student{groupNumber=1, gpa=x, recordBookNumber='1'}"));
+        expectInvalid(() -> StudentParser.parseRecord("Student{groupNumber=0, gpa=4.0, recordBookNumber='1'}"));
+        expectInvalid(() -> StudentParser.parseRecord("Student{groupNumber=1, gpa=5.5, recordBookNumber='1'}"));
+        expectInvalid(() -> StudentParser.parseRecord("Student{groupNumber=1, gpa=4.0, recordBookNumber=''}"));
+        check(messageOf("Student{groupNumber=1, gpa=4.0}", true).contains("Student{groupNumber="), "формат в сообщении");
+    }
+
+    private static void testRecordRoundTrip() {
+        MyList<Student> students = sample();
+        students.add(student(1, 0.0, "000000"));
+        students.add(student(9999, 5.0, "ZB-9912"));
+        students.add(student(2, 0.01, "A, 1"));
+        students.add(student(2, 4.999, "x'y"));
+        students.add(student(2, 1.0E-4, "B"));
+        for (Student original : students) {
+            Student parsed = StudentParser.parseRecord(original.toString());
+            check(parsed.equals(original), "round trip: " + original + " -> " + parsed);
+        }
     }
 
     // ---------- RandomDataSource ----------
@@ -200,6 +261,102 @@ public final class InputOutputTest {
         }
     }
 
+    private static void assertSameStudents(MyList<Student> expected, MyList<Student> actual) {
+        check(actual.size() == expected.size(), "размер " + actual.size() + " вместо " + expected.size());
+        for (int i = 0; i < expected.size(); i++) {
+            check(actual.get(i).equals(expected.get(i)), "позиция " + i + ": " + actual.get(i));
+        }
+    }
+
+    private static void testFileReadsWrittenFormat() throws Exception {
+        Path file = Files.createTempFile("team5-roundtrip", ".txt");
+        try {
+            MyList<Student> original = sample();
+            new ResultWriter().append(file, "Сортировка по полю «Группа»", original);
+            assertSameStudents(original, new FileDataSource(file).load(100));
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    private static void testFileReadsAppendedBlocks() throws Exception {
+        Path file = Files.createTempFile("team5-blocks", ".txt");
+        try {
+            ResultWriter writer = new ResultWriter();
+            MyList<Student> second = new MyArrayList<>();
+            second.add(student(8, 1.5, "ZB-1"));
+            second.add(student(9, 2.5, "A, 2"));
+            writer.append(file, "первый", sample());
+            writer.append(file, "второй", second);
+            MyList<Student> all = new MyArrayList<>();
+            for (Student student : sample()) {
+                all.add(student);
+            }
+            for (Student student : second) {
+                all.add(student);
+            }
+            assertSameStudents(all, new FileDataSource(file).load(100));
+            check(new FileDataSource(file).load(6).size() == 6, "лимит работает через границу блоков");
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    private static void testFileSkipsHeadersSilently() throws Exception {
+        Path file = Files.createTempFile("team5-silent", ".txt");
+        try {
+            ResultWriter writer = new ResultWriter();
+            writer.append(file, "первый", sample());
+            writer.append(file, "второй", sample());
+            int[] loaded = new int[1];
+            String output = captureOutput(() -> loaded[0] = new FileDataSource(file).load(100).size());
+            check(loaded[0] == 10, "десять студентов");
+            check(!output.contains("Пропущена"), "заголовки и пустые строки не должны попадать в сообщения: " + output);
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    private static void testFileReportsBrokenRecord() throws Exception {
+        Path file = tempFile(List.of(
+                "# заголовок",
+                "Student{groupNumber=1, gpa=4.0, recordBookNumber='A1'}",
+                "Student{groupNumber=0, gpa=4.0, recordBookNumber='A2'}",
+                "Student{groupNumber=3, gpa=oops, recordBookNumber='A3'}",
+                "Student{groupNumber=4, gpa=3.0, recordBookNumber='A4'}",
+                ""));
+        try {
+            MyList<Student> list = new MyArrayList<>();
+            String output = captureOutput(() -> {
+                MyList<Student> loaded = new FileDataSource(file).load(10);
+                for (Student student : loaded) {
+                    list.add(student);
+                }
+            });
+            check(list.size() == 2, "две валидные записи, получено " + list.size());
+            check(list.get(0).getGroupNumber() == 1 && list.get(1).getGroupNumber() == 4, "состав");
+            check(output.contains("Пропущена"), "ожидалось сообщение о пропуске: " + output);
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    private static void testFileMixedFormats() throws Exception {
+        Path file = tempFile(List.of(
+                "1;4.5;A1",
+                "# заголовок",
+                "Student{groupNumber=2, gpa=3.5, recordBookNumber='A2'}",
+                "3;2,5;A3"));
+        try {
+            MyList<Student> list = new FileDataSource(file).load(10);
+            check(list.size() == 3, "три студента");
+            check(list.get(0).getGroupNumber() == 1 && list.get(1).getGroupNumber() == 2
+                    && list.get(2).getGroupNumber() == 3, "порядок");
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
     private static void testFileEmpty() throws Exception {
         Path file = tempFile(List.of());
         try {
@@ -259,7 +416,7 @@ public final class InputOutputTest {
             List<String> lines = Files.readAllLines(file);
             check(lines.stream().filter(l -> l.startsWith("# ")).count() == 2, "два заголовка");
             check(lines.stream().filter(l -> l.startsWith("Student{")).count() == 10, "десять записей");
-            check(lines.getFirst().equals("# первый"), "первый блок сохранён");
+            check(lines.get(0).equals("# первый"), "первый блок сохранён");
         } finally {
             Files.deleteIfExists(file);
         }
@@ -296,7 +453,7 @@ public final class InputOutputTest {
         Path file = Files.createTempFile("team5-utf8", ".txt");
         try {
             new ResultWriter().append(file, "Сортировка по полю «Группа»", sample());
-            check(Files.readAllLines(file).getFirst().equals("# Сортировка по полю «Группа»"), "UTF-8");
+            check(Files.readAllLines(file).get(0).equals("# Сортировка по полю «Группа»"), "UTF-8");
         } finally {
             Files.deleteIfExists(file);
         }
