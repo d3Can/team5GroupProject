@@ -45,9 +45,9 @@ public class RandomDataSource implements DataSource {
         double gpa = Math.round(random.nextDouble() * 500) / 100.0;
         String recordBook = String.valueOf(CURRENT_RECORD_BOOK++);
         return Student.builder()
-                .GroupNumber(group)
-                .Gpa(gpa)
-                .RecordBookNumber(recordBook)
+                .groupNumber(group)
+                .gpa(gpa)
+                .recordBookNumber(recordBook)
                 .build();
     }
 }
