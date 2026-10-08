@@ -24,9 +24,9 @@ public final class StudentParser {
         double gpa = parseDouble(parts[1], "Средний балл");
         String recordBook = parseString(parts[2], "Номер зачётной книжки");
         return Student.builder()
-                .GroupNumber(group)
-                .Gpa(gpa)
-                .RecordBookNumber(recordBook)
+                .groupNumber(group)
+                .gpa(gpa)
+                .recordBookNumber(recordBook)
                 .build();
     }
 
@@ -64,9 +64,9 @@ public final class StudentParser {
         double gpa = parseDouble(text.substring(gpaStart, bookKey), "Средний балл");
         String recordBook = parseString(text.substring(bookStart, bookEnd), "Номер зачётной книжки");
         return Student.builder()
-                .GroupNumber(group)
-                .Gpa(gpa)
-                .RecordBookNumber(recordBook)
+                .groupNumber(group)
+                .gpa(gpa)
+                .recordBookNumber(recordBook)
                 .build();
     }
 

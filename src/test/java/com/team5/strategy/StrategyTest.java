@@ -213,9 +213,9 @@ public class StrategyTest {
 
     private static Student student(int groupNumber, double gpa, String recordBookNumber) {
         return Student.builder()
-                .GroupNumber(groupNumber)
-                .Gpa(gpa)
-                .RecordBookNumber(recordBookNumber)
+                .groupNumber(groupNumber)
+                .gpa(gpa)
+                .recordBookNumber(recordBookNumber)
                 .build();
     }
 

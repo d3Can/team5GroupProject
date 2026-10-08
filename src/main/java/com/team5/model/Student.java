@@ -99,17 +99,17 @@ public final class Student implements Comparable<Student> {
         private double gpa;
         private String recordBookNumber;
 
-        public Builder GroupNumber(int groupNumber) {
+        public Builder groupNumber(int groupNumber) {
             this.groupNumber = groupNumber;
             return this;
         }
 
-        public Builder Gpa(double gpa) {
+        public Builder gpa(double gpa) {
             this.gpa = gpa;
             return this;
         }
 
-        public Builder RecordBookNumber(String recordBookNumber) {
+        public Builder recordBookNumber(String recordBookNumber) {
             this.recordBookNumber = recordBookNumber;
             return this;
         }

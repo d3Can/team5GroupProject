@@ -83,7 +83,7 @@ public class TestMenuMain {
     private static void testCountOccurrencesInvalidGpa() {
         System.out.println("\n--- [9] Подсчет вхождений с некорректным GPA ('abc') ---");
         MyList<Student> list = new MyArrayList<>();
-        list.add(Student.builder().GroupNumber(1).Gpa(4.0).RecordBookNumber("111").build());
+        list.add(Student.builder().groupNumber(1).gpa(4.0).recordBookNumber("111").build());
 
         String input = "5\n1\nabc\n0\n";
         runMenuTest(input, list);
@@ -93,7 +93,7 @@ public class TestMenuMain {
     private static void testCountOccurrencesInvalidThreads() {
         System.out.println("\n--- [10] Подсчет вхождений с 0 потоков ---");
         MyList<Student> list = new MyArrayList<>();
-        list.add(Student.builder().GroupNumber(1).Gpa(4.0).RecordBookNumber("111").build());
+        list.add(Student.builder().groupNumber(1).gpa(4.0).recordBookNumber("111").build());
 
         String input = "5\n1\n4.0\n111\n0\n0\n";
         runMenuTest(input, list);
