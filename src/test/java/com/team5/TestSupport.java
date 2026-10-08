@@ -84,9 +84,9 @@ public final class TestSupport {
 
     public static Student student(int group, double gpa, String recordBook) {
         return Student.builder()
-                .GroupNumber(group)
-                .Gpa(gpa)
-                .RecordBookNumber(recordBook)
+                .groupNumber(group)
+                .gpa(gpa)
+                .recordBookNumber(recordBook)
                 .build();
     }
 

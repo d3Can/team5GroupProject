@@ -23,7 +23,6 @@ public class LoopMenu {
     }
 
     public void start(){
-
         boolean menuIsRunning = true;
 
         while (menuIsRunning){
@@ -40,7 +39,6 @@ public class LoopMenu {
                 case 4 -> writeToFile();
                 case 5 -> countOccurrences();
                 default -> System.out.println("Введите корректно и согласно меню!");
-
             }
         }
     }
@@ -252,9 +250,9 @@ public class LoopMenu {
         Student target;
         try {
             target = Student.builder()
-                    .GroupNumber(group)
-                    .Gpa(gpa)
-                    .RecordBookNumber(recordBook)
+                    .groupNumber(group)
+                    .gpa(gpa)
+                    .recordBookNumber(recordBook)
                     .build();
         } catch (IllegalArgumentException e) {
             System.out.println("Некорректные данные: " + e.getMessage());
